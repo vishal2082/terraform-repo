@@ -49,7 +49,7 @@ resource "aws_security_group" "my_security_group" {
 }
 
 # Create Elasctic IP Address
-  resource "aws_eip" "myfirsInatnce"
+  resource "aws_eip" "myfirsInatnce" {
   vpc = true
   instance = aws_instance.myec2_instance.id
   tags= {
