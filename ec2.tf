@@ -2,7 +2,58 @@ provider "aws" {
    region = "us-east-1"
 }
 
-resource "aws_instance" "myec2" {
-   ami = "ami-0ed9277fb7eb570c9"
-   instance_type = "t2.micro"
+# create security group with firewall rules
+
+resource "aws_security_group" "my_security_group" {
+  name = var.security_group
+  description = "security group for Ec2 instance"
+}
+
+  ingress {
+   from_port = 8080
+   to_port   = 8008
+   protocol  = "tcp"
+   cidr_blocks = ["0.0.0.0/0"]
+}
+
+  ingress {
+   from_port = 22
+   to_port   = 22
+   protocol  = "tcp"
+   cidr_blocks = ["0.0.0.0/0"]
+}
+
+# outbound from jenkins server
+
+  egress {
+   from_port = 0
+   to_port   = 65535
+   protocol  = "tcp"
+   cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags= {
+   Name = var.security_group
+  }
+}
+
+# create AWS ec2 instance
+
+ resource "aws_instance" "myec2_instance" {
+  ami = var.ami_id
+  key_name = var.key_name
+  instance_type = var.instance_type
+  security_groups = [var.security_groups]
+  tags= {
+  Name = var.tag_name
+  }
+}
+
+# Create Elasctic IP Address
+  resource "aws_eip" "myfirsInatnce"
+  vpc = true
+  instance = aws_instance.myec2_instance.id
+  tags= {
+    Name = "my_elastic_ip"
+    }
 }
